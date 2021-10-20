@@ -9,17 +9,14 @@ from eralchemy import render_er
 Base = declarative_base()
 
 class User(Base):
-    __tablename__ = 'users'
+    __tablename__ = 'user'
     id = Column(Integer, primary_key=True)
     username = Column(String(100), unique=True, nullable=False)
     password = Column(String(20), nullable=False)
-    favorites_person = relationship("Person", back_populates="relation_user")
-    favorites_planets = relationship("Planet", back_populates="relation_user")
 
-class Person(Base):
-    __tablename__ = 'people' 
+class Character(Base):
+    __tablename__ = 'character' 
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.id'))
     height = Column(String(50))
     mass = Column(String(50))
     hair_color = Column(String(50))
@@ -29,13 +26,10 @@ class Person(Base):
     gender = Column(String(50))
     name = Column(String(50), nullable=False)
     img_url: Column(String)
-    homeworld = relationship("Planet", back_populates="people")
-    relation_user = relationship("User", back_populates="favorites_person")
 
 class Planet(Base):
-    __tablename__ = 'planets'  
+    __tablename__ = 'planet'  
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.id'))
     diameter = Column(String(50))
     rotation_period = Column(String(50))
     orbital_period = Column(String(50))
@@ -46,12 +40,10 @@ class Planet(Base):
     surface_water = Column(String(50))
     name = Column(String(50), nullable=False)
     img_url: Column(String)
-    person = relationship("people")
-    relation_user = relationship("User", back_populates="favorites_planets")
     
 
 class Starship(Base):
-    __tablename__ = 'starships'  
+    __tablename__ = 'starship'  
     id = Column(Integer, primary_key=True)
     model = Column(String(50))
     starship_class = Column(String(50))
@@ -66,8 +58,21 @@ class Starship(Base):
     cargo_capacity = Column(String(50))
     consumables = Column(String(50))
     name = Column(String(50), nullable=False)
-    img_url: Column(String)  
-    people = relationship("Person", uselist=False)
+    img_url: Column(String) 
+    
+
+class Favorite(Base):
+    __tablename__ = 'favorite'
+    id = Column(Integer, primary_key=True)
+    planet_id = Column(Integer, ForeignKey('planet.id'))
+    planet = relationship(Planet)
+    character_id = Column(Integer, ForeignKey('character.id'))
+    character = relationship(Character)
+    starship_id = Column(Integer, ForeignKey('starship.id'))
+    starship = relationship(Starship)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship(User)
+
     def to_dict(self):
         return {}
 
